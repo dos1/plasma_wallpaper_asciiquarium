@@ -38,130 +38,126 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.0
+import QtQuick 2.7
 import QtQuick.Particles 2.0
 
 Item {
-    width: 360
-    height: 600
-
-    Image {
+    Rectangle {
+        color: "black"
+        anchors.fill: parent
+    }
+/*    Image {
         source: "image://org.kde.plasma.asciiquarium/black"
         anchors.fill: parent
     }
+    */
+    Text {
+        font.family: "monospace"
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        id: "label"
+        text: "Hello Asciiquarium World!"
+        color: "white"
+    }
+    FontMetrics {
+        id: monoFontMetrics
+        font.family: "monospace"
+    }
+    Text {
+        anchors.top: label.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        id: "stats"
+        color: "green"
+        property real screenWidth: parent.width / monoFontMetrics.maximumCharacterWidth
+        property real screenHeight: parent.height / monoFontMetrics.lineSpacing
+        text: "Characters are " + monoFontMetrics.maximumCharacterWidth + " by " + monoFontMetrics.lineSpacing + " wide. (" + screenWidth + ", " + screenHeight + ")"
+    }
     ParticleSystem {
+        id: fishSystem
         anchors.fill: parent
+
+        /*
         Emitter {
-            width: parent.width
-            emitRate: 4
-            lifeSpan: 14000
-            size: 80
-            velocity: PointDirection { y: wallpaper.configuration.Speed }
-        }
-        Wander {
-            anchors.fill: parent
-            anchors.bottomMargin: 100
-            xVariance: 60
-            pace: 60
-        }
-
-        //! [0]
-        Affector {
-            property real coefficient: 2.0
-            property real velocity: 1.5
-            width: parent.width
-            height: parent.height - 100
-            onAffectParticles: {
-            /*  //Linear movement
-                if (particle.r == 0) {
-                    particle.r = Math.random() > 0.5 ? -1 : 1;
-                } else if (particle.r == 1) {
-                    particle.rotation += velocity * dt;
-                    if (particle.rotation >= maxAngle)
-                        particle.r = -1;
-                } else if (particle.r == -1) {
-                    particle.rotation -= velocity * dt;
-                    if (particle.rotation <= -1 * maxAngle)
-                        particle.r = 1;
-                }
-            */
-                //Wobbly movement
-                for (var i=0; i<particles.length; i++) {
-                    var particle = particles[i];
-                    if (particle.r == 0.0) {
-                        particle.r = Math.random() + 0.01;
-                    }
-                    particle.rotation += velocity * particle.r * dt;
-                    particle.r -= particle.rotation * coefficient;
-                    if (particle.r == 0.0)
-                        particle.r -= particle.rotation * 0.000001;
-                    particle.update = 1;
-                }
-            }
-        }
-        //! [0]
-
-        //! [1]
-        Affector {//Custom Friction, adds some 'randomness'
-            x: -60
-            width: parent.width + 120
-            height: 100
+            id: castleEmitter
             anchors.bottom: parent.bottom
-            onAffectParticles: {
-                for (var i=0; i<particles.length; i++) {
+            height: 200
+        }
+        */
+        Emitter {
+            id: sharkEmitter
+            anchors.fill: parent
+            emitRate: 0.5
+            maximumEmitted: 1
+            size: 80
+            velocity: PointDirection {
+                x: 60
+                xVariation: 15
+                y: 0
+            }
+            lifeSpan: 30000
+            group: "sharks"
+        }
+        Emitter {
+            id: fishEmitter
+            anchors.fill: parent
+            emitRate: 0.5
+            size: 40
+            velocity: PointDirection {
+                x: 50
+                xVariation: 20
+                y: 0
+            }
+            lifeSpan: 30000
+            group: "fish"
+            onEmitParticles: {
+                for (var i = 0; i < particles.length; i++) {
                     var particle = particles[i];
-                    var pseudoRand = (Math.floor(particle.t*1327) % 10) + 1;
-                    var yslow = dt * pseudoRand * 0.5 + 1;
-                    var xslow = dt * pseudoRand * 0.05 + 1;
-                    if (particle.vy < 1)
-                        particle.vy = 0;
-                    else
-                        particle.vy = (particle.vy / yslow);
-                    if (particle.vx < 1)
-                        particle.vx = 0;
-                    else
-                        particle.vx = (particle.vx / xslow);
-                    particle.update = true;
+                    // Make some go left instead of right
+                    particle.initialVX = ((Math.random() < 0.5) ? 1 : -1) * particle.initialVX;
                 }
             }
         }
-        //! [1]
-
-        ImageParticle {
-            anchors.fill: parent
-            id: particles
-            sprites: [Sprite {
-                    source: "../images/realLeaf1.png"
-                    frameCount: 1
-                    frameDuration: 1
-                    to: {"a":1, "b":1, "c":1, "d":1}
-                }, Sprite {
-                    name: "a"
-                    source: "../images/realLeaf1.png"
-                    frameCount: 1
-                    frameDuration: 10000
-                },
-                Sprite {
-                    name: "b"
-                    source: "../images/realLeaf2.png"
-                    frameCount: 1
-                    frameDuration: 10000
-                },
-                Sprite {
-                    name: "c"
-                    source: "../images/realLeaf3.png"
-                    frameCount: 1
-                    frameDuration: 10000
-                },
-                Sprite {
-                    name: "d"
-                    source: "../images/realLeaf4.png"
-                    frameCount: 1
-                    frameDuration: 10000
+        ItemParticle {
+            groups: [ "fish" ]
+            delegate: Component {
+                Rectangle {
+                    id: fishDelegate
+                    height: 60
+                    width: 120
+                    color: "green"
                 }
-            ]
-
-            z:4
+            }
+        }
+        ItemParticle {
+            groups: [ "sharks" ]
+            delegate: Component {
+                Rectangle {
+                    id: sharkDelegate
+                    height: 200
+                    width: 400
+                    color: "red"
+                }
+            }
+        }
+        Age {
+            /* Kills things at left side of screen */
+            id: leftSpriteRemover
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: 1
+            lifeLeft: 0
+            advancePosition: false
+        }
+        Age {
+            /* Kills things at right side of screen */
+            id: rightSpriteRemover
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: 1
+            lifeLeft: 0
+            advancePosition: false
         }
     }
 }
