@@ -377,6 +377,58 @@ static_assert(
         fishImages.size() % 4 == 0,
         "fishImages must have multiple of 4 sprites!");
 
+// sharks
+auto sharks = array_of<QLatin1String>(
+QLatin1String(
+"                              __\n"
+"                             ( `\\\n"
+"  ,{{{{{{{{{{{{{{{{{{{{{{{{{{" ")   `\\\n"
+";' `.{{{{{{{{{{{{{{{{{{{{{{{{" "(     `\\__\n"
+" ;   `.{{{{{{{{{{{{?__..---''          `~~~~-._\n"
+"  `.   `.____...--''                       (b  `--._\n"
+"    >                     _.-'      .((      ._     )\n"
+"  .`.-`--...__         .-'     -.___.....-(|/|/|/|/'\n"
+" ;.'{{{{{{{{?`. ...----`.___.',,,_______......---'\n"
+" '{{{{{{{{{{?" "'-'\n" ),
+QLatin1String(
+"                                                     \n"
+"                                                     \n"
+"                                                     \n"
+"                                                     \n"
+"                                                     \n"
+"                                           cR        \n"
+"                                                     \n"
+"                                          cWWWWWWWW  \n"
+"                                                     \n"
+"                                                     \n" ),
+QLatin1String(
+"                     __\n"
+"                    /' )\n"
+"                  /'   ({{{{{{{{{{{{{{{{{{{{{{{{{{,\n"
+"              __/'     ){{{{{{{{{{{{{{{{{{{{{{{{.' `;\n"
+"      _.-~~~~'          ``---..__{{{{{{{{{{{{?.'   ;\n"
+" _.--'  b)                       ``--...____.'   .'\n"
+"(     _.      )).      `-._                     <\n"
+" `\\|\\|\\|\\|)-.....___.-     `-.         __...--'-.'.\n"
+"   `---......_______,,,`.___.'----... .'{{{{{{{{?`.;\n"
+"                                     `-`{{{{{{{{{{?`\n" ),
+QLatin1String(
+"                                                     \n"
+"                                                     \n"
+"                                                     \n"
+"                                                     \n"
+"                                                     \n"
+"        Rc                                           \n"
+"                                                     \n"
+"  WWWWWWWWc                                          \n"
+"                                                     \n"
+"                                                     \n" )
+); // sharks[]
+
+static_assert(
+        sharks.size() % 4 == 0,
+        "sharks[] must have multiple of 4 sprites!");
+
 class ColorImageProvider : public QQuickImageProvider
 {
 public:
@@ -406,26 +458,45 @@ public:
             return QPixmap();
         }
 
-        if (idComponents[1] == QLatin1String("fish")) {
-            std::uniform_int_distribution<unsigned> rng(0, fishImages.size() / 4 - 1);
-            unsigned fish = rng(m_gen) * 4;
-            fish += fromLeft ? 0 : 2;
+        size_t arraySize = 0;
+        const QLatin1String *firstSprite = nullptr;
+        bool randomizeColors = false;
+        QRgb defaultColor = qRgb(0, 0, 0);
 
-            const sprite fishSprite = textSpriteFromString(
-                    fishImages[fish],
-                    colorsFromMask(fishImages[fish + 1]),
-                    qRgb(0, 0, 0));
+        auto arraySelector = [&](const auto &chosenArray) {
+            arraySize = chosenArray.size();
+            firstSprite = &chosenArray.front();
+        };
 
-            size_t maxTextWidth = std::accumulate(
-                    fishSprite.begin(), fishSprite.end(), size_t(0),
-                    [](size_t cur, const std::vector<spriteCell>& r)
-                    {
-                        return std::max(cur, r.size());
-                    });
-
-            result = pixmapFromTextSprite(fishSprite, maxTextWidth,
-                    14, 28); // TODO Fix sizing here
+        if (idComponents[1] == QLatin1String("shark")) {
+            arraySelector(sharks);
+            defaultColor = 0x18B2B2;
+        } else {
+            arraySelector(fishImages);
+            randomizeColors = true;
         }
+
+        std::uniform_int_distribution<unsigned> rng(0, (arraySize / 4) - 1);
+        unsigned spriteId = rng(m_gen) * 4;
+        spriteId += fromLeft ? 0 : 2;
+
+        const QLatin1String &colorMask = firstSprite[spriteId + 1];
+        const sprite textSprite = textSpriteFromString(
+                firstSprite[spriteId],
+                randomizeColors
+                    ? colorsFromMask(colorMask)
+                    : colorMask,
+                defaultColor);
+
+        size_t maxTextWidth = std::accumulate(
+                textSprite.begin(), textSprite.end(), size_t(0),
+                [](size_t cur, const std::vector<spriteCell>& r)
+                {
+                    return std::max(cur, r.size());
+                });
+
+        result = pixmapFromTextSprite(textSprite, maxTextWidth,
+                14, 28); // TODO Fix sizing here
 
         if(size) {
             *size = result.size();

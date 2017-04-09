@@ -88,15 +88,21 @@ Item {
         */
         Emitter {
             id: sharkEmitter
-            anchors.fill: parent
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: parent.width / 3
+
             emitRate: 0.5
             maximumEmitted: 1
-            size: 80
+
+            size: 10
             velocity: PointDirection {
                 x: 60
                 xVariation: 15
                 y: 0
             }
+
             lifeSpan: 30000
             group: "sharks"
         }
@@ -157,11 +163,8 @@ Item {
         ItemParticle {
             groups: [ "sharks" ]
             delegate: Component {
-                Rectangle {
-                    id: sharkDelegate
-                    height: 200
-                    width: 400
-                    color: "red"
+                Image {
+                    source: "image://org.kde.plasma.asciiquarium/from_left/shark"
                 }
             }
         }

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.1) # 3.1 has CXX_STANDARD support
 
 project(PlasmaWallpaperAsciiquarium VERSION "0.1")
 set(KF5_DEP_VERSION "5.32.0")

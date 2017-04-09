@@ -15,5 +15,10 @@ target_link_libraries(plasma_wallpaper_asciiquarium
     KF5::Plasma
     )
 
+set_target_properties(plasma_wallpaper_asciiquarium PROPERTIES
+    CXX_STANDARD 14
+    CXX_STANDARD_REQUIRED ON
+)
+
 install(TARGETS plasma_wallpaper_asciiquarium DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/plasma/asciiquarium)
 install(FILES   qmldir                        DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/plasma/asciiquarium)
