@@ -45,14 +45,8 @@ import QtQuick.Particles 2.0
 import org.kde.plasma.asciiquarium 1.0
 
 Item {
-    /*
     Rectangle {
-        color: "black"
-        anchors.fill: parent
-    }
-    */
-    Image {
-        source: "image://org.kde.plasma.asciiquarium/black"
+        color: 'black'
         anchors.fill: parent
     }
     Image {
@@ -77,8 +71,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         id: "stats"
         color: "green"
-        property real screenWidth: parent.width / monoFontMetrics.maximumCharacterWidth
-        property real screenHeight: parent.height / monoFontMetrics.lineSpacing
+        property real screenWidth: (parent.width / monoFontMetrics.maximumCharacterWidth).toFixed(1)
+        property real screenHeight: (parent.height / monoFontMetrics.lineSpacing).toFixed(1)
         text: "Characters are " + monoFontMetrics.maximumCharacterWidth + " by " + monoFontMetrics.lineSpacing + " wide. (" + screenWidth + ", " + screenHeight + ")"
     }
     ParticleSystem {
@@ -133,14 +127,6 @@ Item {
                     cache: false
                     source: "image://org.kde.plasma.asciiquarium/fish"
                 }
-                /*
-                Rectangle {
-                    id: fishDelegate
-                    height: 60
-                    width: 120
-                    color: "green"
-                }
-                */
             }
         }
         ItemParticle {
