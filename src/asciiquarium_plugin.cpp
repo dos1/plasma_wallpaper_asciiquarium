@@ -197,6 +197,7 @@ static constexpr auto array_of(T&&... t)
 //   2. right-facing color mask
 //   3. left-facing fish
 //   4. left-facing color mask
+// {{{
 auto fishImages = array_of<QLatin1String>(
 QLatin1String( "       \\\n"
                "     ...\\..,\n"
@@ -370,6 +371,7 @@ QLatin1String(
 "11116\n" )
 
 ); // fishImages[]
+// }}}
 
 static_assert(
         fishImages.size() % 4 == 0,
