@@ -51,6 +51,11 @@ Item {
         anchors.fill: parent
     }
     */
+    Image {
+        source: "image://org.kde.plasma.asciiquarium/fish"
+        anchors.left: parent.left
+        anchors.top: parent.top
+    }
     Text {
         font.family: "monospace"
         anchors.top: parent.top
@@ -120,6 +125,11 @@ Item {
         ItemParticle {
             groups: [ "fish" ]
             delegate: Component {
+                /*
+                Image {
+                    source: "image://org.kde.plasma.asciiquarium/fish"
+                }
+                */
                 Rectangle {
                     id: fishDelegate
                     height: 60
