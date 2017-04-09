@@ -442,6 +442,6 @@ void AsciiquariumPlugin::initializeEngine(QQmlEngine *engine, const char *uri)
             QLatin1String("org.kde.plasma.asciiquarium"),
             new ColorImageProvider // Qt now owns the pointer
             );
-}
 
-#include "asciiquarium_plugin.moc"
+    Q_UNUSED(uri);
+}
