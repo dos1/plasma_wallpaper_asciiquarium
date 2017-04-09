@@ -41,16 +41,20 @@
 import QtQuick 2.7
 import QtQuick.Particles 2.0
 
+/* Needed for the image provider */
+import org.kde.plasma.asciiquarium 1.0
+
 Item {
+    /*
     Rectangle {
         color: "black"
         anchors.fill: parent
     }
-/*    Image {
+    */
+    Image {
         source: "image://org.kde.plasma.asciiquarium/black"
         anchors.fill: parent
     }
-    */
     Image {
         source: "image://org.kde.plasma.asciiquarium/fish"
         anchors.left: parent.left
@@ -125,17 +129,18 @@ Item {
         ItemParticle {
             groups: [ "fish" ]
             delegate: Component {
-                /*
                 Image {
+                    cache: false
                     source: "image://org.kde.plasma.asciiquarium/fish"
                 }
-                */
+                /*
                 Rectangle {
                     id: fishDelegate
                     height: 60
                     width: 120
                     color: "green"
                 }
+                */
             }
         }
         ItemParticle {

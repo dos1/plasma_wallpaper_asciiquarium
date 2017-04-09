@@ -420,35 +420,26 @@ private:
     std::mt19937 m_gen = std::mt19937(m_rd());
 };
 
-AsciiquariumPlugin::AsciiquariumPlugin(QObject *parent, const QVariantList &args)
-: Plasma::Applet(parent, args)
+AsciiquariumFakeItem::AsciiquariumFakeItem(QObject *parent)
+    : QObject(parent)
 {
-    qInfo() << "Asciiquarium image provider applet loaded";
+}
 
-    // Add our image provider to the QmlEngine
-    auto engine = qmlEngine(this);
-    if (!engine) {
-        return;
-    }
+void AsciiquariumPlugin::registerTypes(const char *uri)
+{
+    Q_ASSERT(uri == QLatin1String("org.kde.plasma.asciiquarium"));
 
+    qmlRegisterType<AsciiquariumFakeItem>(uri, 1, 0, "FakeItem");
+}
+
+void AsciiquariumPlugin::initializeEngine(QQmlEngine *engine, const char *uri)
+{
     qInfo() << "Adding asciiquarium image provider to existing QML engine";
 
-    // Qt now owns the pointer
     engine->addImageProvider(
             QLatin1String("org.kde.plasma.asciiquarium"),
-            new ColorImageProvider
+            new ColorImageProvider // Qt now owns the pointer
             );
 }
-
-AsciiquariumPlugin::~AsciiquariumPlugin()
-{
-}
-
-void AsciiquariumPlugin::init()
-{
-    Plasma::Applet::init();
-}
-
-K_EXPORT_PLASMA_APPLET_WITH_JSON(asciiquarium_plugin, AsciiquariumPlugin, "metadata.json")
 
 #include "asciiquarium_plugin.moc"
