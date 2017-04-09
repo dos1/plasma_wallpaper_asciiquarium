@@ -101,8 +101,13 @@ Item {
             group: "sharks"
         }
         Emitter {
-            id: fishEmitter
-            anchors.fill: parent
+            id: leftFishEmitter
+
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: parent.width / 3
+
             emitRate: 0.5
             size: 40
             velocity: PointDirection {
@@ -111,21 +116,41 @@ Item {
                 y: 0
             }
             lifeSpan: 30000
-            group: "fish"
-            onEmitParticles: {
-                for (var i = 0; i < particles.length; i++) {
-                    var particle = particles[i];
-                    // Make some go left instead of right
-                    particle.initialVX = ((Math.random() < 0.5) ? 1 : -1) * particle.initialVX;
+            group: "fish_from_left"
+        }
+        Emitter {
+            id: rightFishEmitter
+
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: parent.width / 3
+
+            emitRate: 0.5
+            size: 40
+            velocity: PointDirection {
+                x: -50
+                xVariation: 20
+                y: 0
+            }
+            lifeSpan: 30000
+            group: "fish_from_right"
+        }
+        ItemParticle {
+            groups: [ "fish_from_left" ]
+            delegate: Component {
+                Image {
+                    cache: false
+                    source: "image://org.kde.plasma.asciiquarium/from_left/fish"
                 }
             }
         }
         ItemParticle {
-            groups: [ "fish" ]
+            groups: [ "fish_from_right" ]
             delegate: Component {
                 Image {
                     cache: false
-                    source: "image://org.kde.plasma.asciiquarium/fish"
+                    source: "image://org.kde.plasma.asciiquarium/from_right/fish"
                 }
             }
         }

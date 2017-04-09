@@ -392,11 +392,24 @@ public:
         if (id == QLatin1String("black")) {
             result = QPixmap(requestedSize);
             result.fill(Qt::black);
+            return result;
         }
-        else {
+
+        // Not something simple, determine direction first
+        QStringList idComponents = id.split(QLatin1Char('/'));
+        bool fromLeft = !idComponents.isEmpty() &&
+            idComponents[0] == QLatin1String("from_left");
+        if (idComponents.size() < 2 ||
+                (!fromLeft && idComponents[0] != QLatin1String("from_right")))
+        {
+            qWarning() << "Unknown pixmap id " << id << " for asciiquarium";
+            return QPixmap();
+        }
+
+        if (idComponents[1] == QLatin1String("fish")) {
             std::uniform_int_distribution<unsigned> rng(0, fishImages.size() / 4 - 1);
             unsigned fish = rng(m_gen) * 4;
-            fish += m_gen() % 2 ? 2 : 0; // Select left or right-facing
+            fish += fromLeft ? 0 : 2;
 
             const sprite fishSprite = textSpriteFromString(
                     fishImages[fish],
@@ -411,7 +424,7 @@ public:
                     });
 
             result = pixmapFromTextSprite(fishSprite, maxTextWidth,
-                    14, 28);
+                    14, 28); // TODO Fix sizing here
         }
 
         if(size) {
