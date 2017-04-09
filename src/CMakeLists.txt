@@ -1,4 +1,4 @@
-plasma_install_package(pkg org.kde.plasma.asciiquarium wallpapers Wallpaper)
+plasma_install_package(pkg org.kde.plasma.asciiquarium wallpapers wallpaper)
 
 set(asciiquarium_plugin_SRCS
     asciiquarium_plugin.cpp
