@@ -88,7 +88,7 @@ static QPixmap pixmapFromTextSprite (
 
 static sprite textSpriteFromString(
         const QString &text,
-        const QString &mask,
+        const QString &colors,
         QRgb defaultColor
         )
 {
@@ -111,7 +111,7 @@ static sprite textSpriteFromString(
     }
 
     // overlay mask colors
-    rows = mask.split(QLatin1Char('\n'));
+    rows = colors.split(QLatin1Char('\n'));
     size_t y = 0;
 
     for(const auto &row : rows) {
@@ -399,13 +399,17 @@ public:
             fish += m_gen() % 2 ? 2 : 0; // Select left or right-facing
 
             const sprite fishSprite = textSpriteFromString(
-                    fishImages[fish], fishImages[fish + 1], qRgb(0, 0, 0));
+                    fishImages[fish],
+                    colorsFromMask(fishImages[fish + 1]),
+                    qRgb(0, 0, 0));
+
             size_t maxTextWidth = std::accumulate(
                     fishSprite.begin(), fishSprite.end(), size_t(0),
                     [](size_t cur, const std::vector<spriteCell>& r)
                     {
                         return std::max(cur, r.size());
                     });
+
             result = pixmapFromTextSprite(fishSprite, maxTextWidth,
                     14, 28);
         }
@@ -415,6 +419,25 @@ public:
         }
 
         return result;
+    }
+
+private:
+    QString colorsFromMask(QString mask)
+    {
+        static auto colors = array_of<char>(
+            'c','C','r','R','y','Y','b','B','g','G','m','M'
+        );
+        static std::uniform_int_distribution<size_t> color_rng(0, colors.size() - 1);
+
+        for (char i = '1'; i <= '9'; ++i)
+        {
+            // '4' is the eye pixel
+            const char colorId = i == '4' ? 'W'
+                                          : colors[color_rng(m_gen)];
+            mask.replace(QLatin1Char(i), QLatin1Char(colorId));
+        }
+
+        return mask;
     }
 
 private:
