@@ -50,9 +50,14 @@ Item {
         anchors.fill: parent
     }
     Image {
-        source: "image://org.kde.plasma.asciiquarium/fish"
+        source: "image://org.kde.plasma.asciiquarium/from_left/fish"
         anchors.left: parent.left
         anchors.top: parent.top
+    }
+    Image {
+        visible: false // Here only so we can get its size.  It is shown elsewhere
+        id: sharkPicture
+        source: "image://org.kde.plasma.asciiquarium/from_left/shark"
     }
     Text {
         font.family: "monospace"
@@ -96,7 +101,8 @@ Item {
             emitRate: 0.5
             maximumEmitted: 1
 
-            size: 10
+            size: sharkPicture.width
+
             velocity: PointDirection {
                 x: 60
                 xVariation: 15
@@ -142,14 +148,39 @@ Item {
             lifeSpan: 30000
             group: "fish_from_right"
         }
-        ItemParticle {
+        CustomParticle {
             groups: [ "fish_from_left" ]
-            delegate: Component {
-                Image {
-                    cache: false
-                    source: "image://org.kde.plasma.asciiquarium/from_left/fish"
-                }
+            property variant source: Image {
+                id: leftFishImage
+                cache: false
+                source: "image://org.kde.plasma.asciiquarium/from_left/fish"
             }
+            property variant tex_w: leftFishImage.width
+            property variant tex_h: leftFishImage.height
+            vertexShader:"
+                uniform float tex_w;
+                uniform float tex_h;
+                void main() {
+                    highp float t = (qt_Timestamp - qt_ParticleData.x) / qt_ParticleData.y;
+
+                    /* Needed to account for non-square size */
+                    highp vec2 size = vec2(tex_w, tex_h);
+
+                    highp vec2 pos = qt_ParticlePos
+                                - (size / 2.)
+                                + size * qt_ParticleTex
+                                + qt_ParticleVec.xy * (t * qt_ParticleData.y);
+
+                    pos.x = pos.x / 14.;
+                    pos.y = pos.y / 28.;
+                    pos = floor(pos);
+                    pos.x = pos.x * 14.;
+                    pos.y = pos.y * 28.;
+
+                    qt_TexCoord0 = qt_ParticleTex;
+                    gl_Position = qt_Matrix * vec4(pos.x, pos.y, 0, 1);
+                }
+            "
         }
         ItemParticle {
             groups: [ "fish_from_right" ]
@@ -160,13 +191,37 @@ Item {
                 }
             }
         }
-        ItemParticle {
+        CustomParticle {
             groups: [ "sharks" ]
-            delegate: Component {
-                Image {
-                    source: "image://org.kde.plasma.asciiquarium/from_left/shark"
+
+            property variant source: sharkPicture // defined far above
+            property variant tex_w: sharkPicture.width
+            property variant tex_h: sharkPicture.height
+
+            vertexShader:"
+                uniform float tex_w;
+                uniform float tex_h;
+                void main() {
+                    highp float t = (qt_Timestamp - qt_ParticleData.x) / qt_ParticleData.y;
+
+                    /* Needed to account for non-square size */
+                    highp vec2 size = vec2(tex_w, tex_h);
+
+                    highp vec2 pos = qt_ParticlePos
+                                - (size / 2.)
+                                + size * qt_ParticleTex
+                                + qt_ParticleVec.xy * (t * qt_ParticleData.y);
+
+                    pos.x = pos.x / 14.;
+                    pos.y = pos.y / 28.;
+                    pos = floor(pos);
+                    pos.x = pos.x * 14.;
+                    pos.y = pos.y * 28.;
+
+                    qt_TexCoord0 = qt_ParticleTex;
+                    gl_Position = qt_Matrix * vec4(pos.x, pos.y, 0, 1);
                 }
-            }
+            "
         }
         Age {
             /* Kills things at left side of screen */
