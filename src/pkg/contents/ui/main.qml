@@ -1,7 +1,7 @@
 import QtQuick 2.7
 import QtQuick.Particles 2.0
 
-/* Needed for the image provider */
+// Needed for the image provider and AsciiquariumAnimator
 import org.kde.plasma.asciiquarium 1.0
 
 Item {
@@ -36,9 +36,13 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         id: "stats"
         color: "green"
-        property real screenWidth: (parent.width / monoFontMetrics.maximumCharacterWidth).toFixed(1)
-        property real screenHeight: (parent.height / monoFontMetrics.lineSpacing).toFixed(1)
-        text: "Characters are " + monoFontMetrics.maximumCharacterWidth + " by " + monoFontMetrics.lineSpacing + " wide. (" + screenWidth + ", " + screenHeight + ")"
+
+        property int moveStepX: monoFontMetrics.maximumCharacterWidth
+        property int moveStepY: monoFontMetrics.lineSpacing
+        property real screenWidth: (parent.width / moveStepX).toFixed(1)
+        property real screenHeight: (parent.height / moveStepY).toFixed(1)
+
+        text: "Characters are " + moveStepX + " by " + moveStepY + " wide. (" + screenWidth + ", " + screenHeight + ")"
     }
     ParticleSystem {
         id: fishSystem
@@ -73,24 +77,6 @@ Item {
             group: "sharks"
         }
         Emitter {
-            id: leftFishEmitter
-
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            width: parent.width / 3
-
-            emitRate: 0.5
-            size: 40
-            velocity: PointDirection {
-                x: 50
-                xVariation: 20
-                y: 0
-            }
-            lifeSpan: 30000
-            group: "fish_from_left"
-        }
-        Emitter {
             id: rightFishEmitter
 
             anchors.right: parent.right
@@ -108,39 +94,23 @@ Item {
             lifeSpan: 30000
             group: "fish_from_right"
         }
-        CustomParticle {
-            groups: [ "fish_from_left" ]
-            property variant source: Image {
-                id: leftFishImage
-                cache: false
-                source: "image://org.kde.plasma.asciiquarium/from_left/fish"
+        Image {
+            cache: false
+            source: "image://org.kde.plasma.asciiquarium/from_left/fish"
+            AsciiquariumAnimator on x {
+                moveStep: stats.moveStepX
             }
-            property variant tex_w: leftFishImage.width
-            property variant tex_h: leftFishImage.height
-            vertexShader:"
-                uniform float tex_w;
-                uniform float tex_h;
-                void main() {
-                    highp float t = (qt_Timestamp - qt_ParticleData.x) / qt_ParticleData.y;
-
-                    /* Needed to account for non-square size */
-                    highp vec2 size = vec2(tex_w, tex_h);
-
-                    highp vec2 pos = qt_ParticlePos
-                                - (size / 2.)
-                                + size * qt_ParticleTex
-                                + qt_ParticleVec.xy * (t * qt_ParticleData.y);
-
-                    pos.x = pos.x / 14.;
-                    pos.y = pos.y / 28.;
-                    pos = floor(pos);
-                    pos.x = pos.x * 14.;
-                    pos.y = pos.y * 28.;
-
-                    qt_TexCoord0 = qt_ParticleTex;
-                    gl_Position = qt_Matrix * vec4(pos.x, pos.y, 0, 1);
-                }
-            "
+            x: 40
+            y: 100
+        }
+        Image {
+            cache: false
+            source: "image://org.kde.plasma.asciiquarium/from_left/fish"
+            AsciiquariumAnimator on x {
+                moveStep: stats.moveStepX
+            }
+            x: 80
+            y: 250
         }
         ItemParticle {
             groups: [ "fish_from_right" ]

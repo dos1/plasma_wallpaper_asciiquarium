@@ -4,6 +4,8 @@
 #include <QtDebug>
 #include <QQmlEngine>
 #include <QQuickImageProvider>
+#include <QQuickItem>
+#include <QVariant>
 #include <QSize>
 #include <QFontDatabase>
 #include <QImage>
@@ -529,16 +531,30 @@ private:
     std::mt19937 m_gen = std::mt19937(m_rd());
 };
 
-AsciiquariumFakeItem::AsciiquariumFakeItem(QObject *parent)
+AsciiquariumAnimator::AsciiquariumAnimator(QObject *parent)
     : QObject(parent)
 {
+    QObject::connect(
+            &m_timer, &QTimer::timeout,
+            this, &AsciiquariumAnimator::updateProperty);
+    m_timer.start(999); // TODO: Reduce this to minimum needed
+}
+
+void AsciiquariumAnimator::updateProperty()
+{
+    int newX = m_targetProperty.read().toInt() + m_moveStep;
+    QQuickItem *item = qobject_cast<QQuickItem*>(m_targetProperty.object());
+    if (item && item->parent() && newX >= item->parentItem()->width()) {
+        newX = 0;
+    }
+    m_targetProperty.write(newX);
 }
 
 void AsciiquariumPlugin::registerTypes(const char *uri)
 {
     Q_ASSERT(uri == QLatin1String("org.kde.plasma.asciiquarium"));
 
-    qmlRegisterType<AsciiquariumFakeItem>(uri, 1, 0, "FakeItem");
+    qmlRegisterType<AsciiquariumAnimator>(uri, 1, 0, "AsciiquariumAnimator");
 }
 
 void AsciiquariumPlugin::initializeEngine(QQmlEngine *engine, const char *uri)
