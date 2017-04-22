@@ -534,10 +534,20 @@ private:
 AsciiquariumAnimator::AsciiquariumAnimator(QObject *parent)
     : QObject(parent)
 {
+    // Timer updated by m_msPerStep
     QObject::connect(
             &m_timer, &QTimer::timeout,
             this, &AsciiquariumAnimator::updateProperty);
-    m_timer.start(999); // TODO: Reduce this to minimum needed
+}
+
+void AsciiquariumAnimator::setMsPerStep(int newMsPerStep)
+{
+    auto oldStep = m_msPerStep;
+
+    m_msPerStep = newMsPerStep;
+    if (oldStep != newMsPerStep) {
+        m_timer.start(newMsPerStep);
+    }
 }
 
 void AsciiquariumAnimator::updateProperty()

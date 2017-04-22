@@ -25,12 +25,16 @@ class AsciiquariumAnimator : public QObject, public QQmlPropertyValueSource
     Q_OBJECT
     Q_INTERFACES(QQmlPropertyValueSource)
     Q_PROPERTY(int moveStep READ moveStep WRITE setMoveStep)
+    Q_PROPERTY(int msPerStep READ msPerStep WRITE setMsPerStep)
 
 public:
     AsciiquariumAnimator(QObject *parent = 0);
 
     int moveStep() const { return m_moveStep; }
     void setMoveStep(int newMoveStep) { m_moveStep = newMoveStep; }
+
+    int msPerStep() const { return m_msPerStep; }
+    void setMsPerStep(int newMsPerStep);
 
     virtual void setTarget(const QQmlProperty &property) override
     {
@@ -44,4 +48,5 @@ private:
     QQmlProperty m_targetProperty;
     QTimer m_timer;
     int m_moveStep = 8;
+    int m_msPerStep = 0;
 };

@@ -94,23 +94,11 @@ Item {
             lifeSpan: 30000
             group: "fish_from_right"
         }
-        Image {
-            cache: false
-            source: "image://org.kde.plasma.asciiquarium/from_left/fish"
-            AsciiquariumAnimator on x {
-                moveStep: stats.moveStepX
-            }
-            x: 40
-            y: 100
+        Fish {
+            moveStepX: stats.moveStepX
         }
-        Image {
-            cache: false
-            source: "image://org.kde.plasma.asciiquarium/from_left/fish"
-            AsciiquariumAnimator on x {
-                moveStep: stats.moveStepX
-            }
-            x: 80
-            y: 250
+        Fish {
+            moveStepX: stats.moveStepX
         }
         ItemParticle {
             groups: [ "fish_from_right" ]

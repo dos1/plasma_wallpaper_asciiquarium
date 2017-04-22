@@ -22,3 +22,4 @@ set_target_properties(plasma_wallpaper_asciiquarium PROPERTIES
 
 install(TARGETS plasma_wallpaper_asciiquarium DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/plasma/asciiquarium)
 install(FILES   qmldir                        DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/plasma/asciiquarium)
+install(FILES   pkg/contents/ui/Fish.qml      DESTINATION ${KDE_INSTALL_QMLDIR}/org/kde/plasma/asciiquarium)
