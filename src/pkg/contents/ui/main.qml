@@ -5,14 +5,39 @@ import QtQuick.Particles 2.0
 import org.kde.plasma.asciiquarium 1.0
 
 Item {
+    function randBetween(l, r) {
+        return Math.floor(l + (Math.random() * (r - l)));
+    }
+
+    Component.onCompleted: {
+        var component = Qt.createComponent("Fish.qml")
+
+        for (var i = 0; i < 100; i++) {
+            var startX = randBetween(0, Math.floor(stats.screenWidth / 3))
+            startX = startX * stats.moveStepX
+            var startY = randBetween(8, Math.floor(stats.screenHeight) - 10)
+            startY = startY * stats.moveStepY
+
+            try {
+                var fishy = component.createObject(fishSystem, {
+                    "moveStepX": Qt.binding(function() {
+                        return stats.moveStepX
+                    }),
+                    "x": startX,
+                    "y": startY,
+                })
+            }
+            catch(err) {
+                for (var i = 0; i < err.qmlErrors.length; i++) {
+                    console.log("Couldn't create fish " + error.qmlErrors[i].message)
+                }
+            }
+        }
+    }
+
     Rectangle {
         color: 'black'
         anchors.fill: parent
-    }
-    Image {
-        source: "image://org.kde.plasma.asciiquarium/from_left/fish"
-        anchors.left: parent.left
-        anchors.top: parent.top
     }
     Image {
         visible: false // Here only so we can get its size.  It is shown elsewhere
@@ -34,7 +59,7 @@ Item {
     Text {
         anchors.top: label.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        id: "stats"
+        id: stats
         color: "green"
 
         property int moveStepX: monoFontMetrics.maximumCharacterWidth
@@ -93,12 +118,6 @@ Item {
             }
             lifeSpan: 30000
             group: "fish_from_right"
-        }
-        Fish {
-            moveStepX: stats.moveStepX
-        }
-        Fish {
-            moveStepX: stats.moveStepX
         }
         ItemParticle {
             groups: [ "fish_from_right" ]

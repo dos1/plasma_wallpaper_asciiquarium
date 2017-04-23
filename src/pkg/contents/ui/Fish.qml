@@ -15,14 +15,12 @@ Image {
     }
 
     property int moveStepX: 0
-    property int msPerStep: randBetween(500, 1100)
-    x: randBetween(40, 100) // TODO: Fix to be in step size increments
-    y: randBetween(80, 400) // TODO: Fix to be in step size increments
+    property int msPerStep: randBetween(80, 1100)
 
     // Move in blocky steps
     AsciiquariumAnimator on x {
         // TODO: Make these properties aliases?
         moveStep: shell.moveStepX
-        msPerStep: shell.msPerStep;
+        msPerStep: shell.msPerStep
     }
 }
