@@ -552,10 +552,11 @@ void AsciiquariumAnimator::setMsPerStep(int newMsPerStep)
 
 void AsciiquariumAnimator::updateProperty()
 {
-    int newX = m_targetProperty.read().toInt() + m_moveStep;
+    const int sign = m_leftFacing ? -1 : 1;
+    int newX = m_targetProperty.read().toInt() + sign * m_moveStep;
     QQuickItem *item = qobject_cast<QQuickItem*>(m_targetProperty.object());
-    if (item && item->parent() && newX >= item->parentItem()->width()) {
-        newX = 0;
+    if (item && item->parent() && (newX >= item->parentItem()->width() || newX <= 0)) {
+        newX = m_leftFacing ? item->parentItem()->width() : 0;
     }
     m_targetProperty.write(newX);
 }

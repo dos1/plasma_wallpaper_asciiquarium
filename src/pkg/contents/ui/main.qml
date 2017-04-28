@@ -9,29 +9,43 @@ Item {
         return Math.floor(l + (Math.random() * (r - l)));
     }
 
+    id: rootItem
+
     Component.onCompleted: {
         var component = Qt.createComponent("Fish.qml")
 
-        for (var i = 0; i < 100; i++) {
-            var startX = randBetween(0, Math.floor(stats.screenWidth / 3))
-            startX = startX * stats.moveStepX
-            var startY = randBetween(8, Math.floor(stats.screenHeight) - 10)
-            startY = startY * stats.moveStepY
+        if (component.status == Component.Ready) {
+            for (var i = 0; i < 100; i++) {
+                var startX = randBetween(0, Math.floor(stats.screenWidth / 3))
+                startX = startX * stats.moveStepX
+                var leftFacing = (i % 2 < 1)
 
-            try {
-                var fishy = component.createObject(fishSystem, {
-                    "moveStepX": Qt.binding(function() {
-                        return stats.moveStepX
-                    }),
-                    "x": startX,
-                    "y": startY,
-                })
-            }
-            catch(err) {
-                for (var i = 0; i < err.qmlErrors.length; i++) {
-                    console.log("Couldn't create fish " + error.qmlErrors[i].message)
+                if (leftFacing) {
+                    startX = rootItem.width - stats.moveStepX * 10 - startX
+                }
+
+                var startY = randBetween(8, Math.floor(stats.screenHeight) - 10)
+                startY = startY * stats.moveStepY
+
+                try {
+                    var fishy = component.createObject(fishSystem, {
+                        "leftFacing": leftFacing,
+                        "moveStepX": Qt.binding(function() {
+                            return stats.moveStepX
+                        }),
+                        "x": startX,
+                        "y": startY,
+                    })
+                }
+                catch(err) {
+                    for (var i = 0; i < err.qmlErrors.length; i++) {
+                        console.log("Couldn't create fish " + error.qmlErrors[i].message)
+                    }
                 }
             }
+        }
+        else if (component.status == Component.Error) {
+            console.log("Component failed to load, error ", component.errorString())
         }
     }
 
@@ -100,33 +114,6 @@ Item {
 
             lifeSpan: 30000
             group: "sharks"
-        }
-        Emitter {
-            id: rightFishEmitter
-
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            width: parent.width / 3
-
-            emitRate: 0.5
-            size: 40
-            velocity: PointDirection {
-                x: -50
-                xVariation: 20
-                y: 0
-            }
-            lifeSpan: 30000
-            group: "fish_from_right"
-        }
-        ItemParticle {
-            groups: [ "fish_from_right" ]
-            delegate: Component {
-                Image {
-                    cache: false
-                    source: "image://org.kde.plasma.asciiquarium/from_right/fish"
-                }
-            }
         }
         CustomParticle {
             groups: [ "sharks" ]
