@@ -1,5 +1,6 @@
 /*
  *  Copyright 2013 Marco Martin <mart@kde.org>
+ *  Copyright 2017 Michael Pyne <mpyne@kde.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,7 +26,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 
 Column {
     id: root
-    property alias cfg_Speed: slider.value
+    property alias cfg_NumFish: slider.value
 
     Row {
         spacing: units.largeSpacing / 2
@@ -33,7 +34,7 @@ Column {
         QtControls.Label {
             width: formAlignment - units.largeSpacing
             horizontalAlignment: Text.AlignRight
-            text: "Speed:"
+            text: "Number of fish (not working yet): "
         }
         QtControls.Slider {
             id: slider

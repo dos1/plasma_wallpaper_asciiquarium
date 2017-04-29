@@ -6,8 +6,8 @@
   <kcfgfile name=""/>
 
   <group name="General">
-    <entry name="Speed" type="int">
-      <label>Speed of the leaves</label>
+    <entry name="NumFish" type="int">
+      <label>Number of fish</label>
       <default>60</default>
       <min>20</min>
       <max>150</max>
