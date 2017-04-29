@@ -54,7 +54,7 @@ Item {
         anchors.fill: parent
     }
     BorderImage {
-        y: 5 * monoFontMetrics.lineSpacing
+        y: 5 * stats.moveStepY
         anchors.left: parent.left
         anchors.right: parent.right
         source: "image://org.kde.plasma.asciiquarium/ocean"
@@ -82,18 +82,14 @@ Item {
         text: "Hello Asciiquarium World!"
         color: "white"
     }
-    FontMetrics {
-        id: monoFontMetrics
-        font.family: "monospace"
-    }
     Text {
         anchors.top: label.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         id: stats
         color: "green"
 
-        property int moveStepX: monoFontMetrics.maximumCharacterWidth
-        property int moveStepY: monoFontMetrics.lineSpacing
+        property int moveStepX: asciiquariumCellWidth
+        property int moveStepY: asciiquariumCellHeight
         property real screenWidth: (parent.width / moveStepX).toFixed(1)
         property real screenHeight: (parent.height / moveStepY).toFixed(1)
 
@@ -130,10 +126,15 @@ Item {
             property variant source: sharkPicture // defined far above
             property variant tex_w: sharkPicture.width
             property variant tex_h: sharkPicture.height
+            property double cell_w: asciiquariumCellWidth
+            property double cell_h: asciiquariumCellHeight
 
             vertexShader:"
                 uniform float tex_w;
                 uniform float tex_h;
+                uniform float cell_w;
+                uniform float cell_h;
+
                 void main() {
                     highp float t = (qt_Timestamp - qt_ParticleData.x) / qt_ParticleData.y;
 
@@ -145,11 +146,11 @@ Item {
                                 + size * qt_ParticleTex
                                 + qt_ParticleVec.xy * (t * qt_ParticleData.y);
 
-                    pos.x = pos.x / 14.;
-                    pos.y = pos.y / 28.;
+                    pos.x = pos.x / cell_w;
+                    pos.y = pos.y / cell_h;
                     pos = floor(pos);
-                    pos.x = pos.x * 14.;
-                    pos.y = pos.y * 28.;
+                    pos.x = pos.x * cell_w;
+                    pos.y = pos.y * cell_h;
 
                     qt_TexCoord0 = qt_ParticleTex;
                     gl_Position = qt_Matrix * vec4(pos.x, pos.y, 0, 1);

@@ -27,14 +27,26 @@ using spriteCell = std::pair<QLatin1Char, QRgb>;
 using std::size_t;
 using sprite = std::vector<std::vector<spriteCell>>;
 
-static QPixmap pixmapFromTextSprite (
-        const sprite &text,
-        size_t cellWidth,
-        size_t cellHeight
-        )
+static QFont monoFont()
 {
-    size_t &h = cellHeight;
-    size_t &w = cellWidth;
+    static QFont monoFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    return monoFont;
+}
+
+static QFontMetrics monoFontMetrics()
+{
+    static QFontMetrics fm(monoFont());
+    return fm;
+}
+
+static QPixmap pixmapFromTextSprite (const sprite &text)
+{
+    static const QFont textFont(monoFont());
+    static const QFontMetrics fm(monoFontMetrics());
+
+    const size_t &h = fm.lineSpacing();
+    const size_t &w = fm.width(QLatin1Char('X'));
+
     size_t textHeight = text.size();
     size_t textWidth = std::accumulate(
             text.begin(), text.end(), size_t(0),
@@ -56,9 +68,7 @@ static QPixmap pixmapFromTextSprite (
 
     p.setCompositionMode(QPainter::CompositionMode_Source);
     p.setRenderHint(QPainter::TextAntialiasing);
-    p.setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-
-    QFontMetrics fm(p.fontMetrics());
+    p.setFont(textFont);
 
     const QLatin1Char space(' ');
     const QLatin1Char question('?');
@@ -486,9 +496,6 @@ public:
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) override
     {
         QPixmap result;
-        // TODO Fix sizing here
-        const size_t cellWidth = 14;
-        const size_t cellHeight = 28;
 
         if (id == QLatin1String("black")) {
             result = QPixmap(requestedSize);
@@ -502,7 +509,7 @@ public:
             ? textSpriteFromString(castle[0], castle[1], 0x686868)
             : textSpriteFromFacingId(id);
 
-        result = pixmapFromTextSprite(textSprite, cellWidth, cellHeight);
+        result = pixmapFromTextSprite(textSprite);
         if (size) {
             *size = result.size();
         }
@@ -623,6 +630,16 @@ void AsciiquariumPlugin::initializeEngine(QQmlEngine *engine, const char *uri)
             QLatin1String("org.kde.plasma.asciiquarium"),
             new ColorImageProvider // Qt now owns the pointer
             );
+
+    QQmlContext *qmlContext = engine->rootContext();
+    const QFontMetrics &fm(monoFontMetrics());
+
+    qmlContext->setContextProperty(
+            QLatin1String("asciiquariumCellWidth"),
+            QVariant(fm.width(QLatin1Char('X'))));
+    qmlContext->setContextProperty(
+            QLatin1String("asciiquariumCellHeight"),
+            QVariant(fm.lineSpacing()));
 
     Q_UNUSED(uri);
 }
