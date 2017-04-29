@@ -435,6 +435,39 @@ static_assert(
         sharks.size() % 4 == 0,
         "sharks[] must have multiple of 4 sprites!");
 
+// castle
+auto castle = array_of<QLatin1String>(
+QLatin1String(
+"               T~~\n"
+"               |\n"
+"              /^\\\n"
+"             /   \\\n"
+" _   _   _  /     \\  _   _   _\n"
+"[ ]_[ ]_[ ]/ _   _ \\[ ]_[ ]_[ ]\n"
+"|_=__-_ =_|_[ ]_[ ]_|_=-___-__|\n"
+" | _- =  | =_ = _    |= _=   |\n"
+" |= -[]  |- = _ =    |_-=_[] |\n"
+" | =_    |= - ___    | =_ =  |\n"
+" |=  []- |-  /| |\\   |=_ =[] |\n"
+" |- =_   | =| | | |  |- = -  |\n"
+" |_______|__|_|_|_|__|_______|\n" ),
+QLatin1String(
+"                RR\n"
+"\n"
+"              yyy\n"
+"             y   y\n"
+"            y     y\n"
+"           y       y\n"
+"\n"
+"\n"
+"\n"
+"              yyy\n"
+"             yy yy\n"
+"            y y y y\n"
+"            yyyyyyy\n" )
+); // castle[]
+
+
 // oceans
 auto oceanSpriteText =
     QLatin1String( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
@@ -465,6 +498,8 @@ public:
 
         const sprite textSprite = (id == QLatin1String("ocean"))
             ? textSpriteFromString(oceanSpriteText, QLatin1String(), 0x149494)
+            : (id == QLatin1String("castle"))
+            ? textSpriteFromString(castle[0], castle[1], 0x686868)
             : textSpriteFromFacingId(id);
 
         result = pixmapFromTextSprite(textSprite, cellWidth, cellHeight);

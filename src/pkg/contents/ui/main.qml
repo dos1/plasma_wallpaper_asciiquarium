@@ -63,6 +63,13 @@ Item {
         horizontalTileMode: BorderImage.Repeat
     }
     Image {
+        id: castle
+        x: stats.moveStepX * (Math.floor(stats.screenWidth)  - 32)
+        y: stats.moveStepY * (Math.floor(stats.screenHeight) - 13)
+        source: "image://org.kde.plasma.asciiquarium/castle"
+        z: 1
+    }
+    Image {
         visible: false // Here only so we can get its size.  It is shown elsewhere
         id: sharkPicture
         source: "image://org.kde.plasma.asciiquarium/from_left/shark"
@@ -96,13 +103,6 @@ Item {
         id: fishSystem
         anchors.fill: parent
 
-        /*
-        Emitter {
-            id: castleEmitter
-            anchors.bottom: parent.bottom
-            height: 200
-        }
-        */
         Emitter {
             id: sharkEmitter
             anchors.left: parent.left
