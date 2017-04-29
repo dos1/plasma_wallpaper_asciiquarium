@@ -53,6 +53,15 @@ Item {
         color: 'black'
         anchors.fill: parent
     }
+    BorderImage {
+        y: 5 * monoFontMetrics.lineSpacing
+        anchors.left: parent.left
+        anchors.right: parent.right
+        source: "image://org.kde.plasma.asciiquarium/ocean"
+        cache: false
+        smooth: false
+        horizontalTileMode: BorderImage.Repeat
+    }
     Image {
         visible: false // Here only so we can get its size.  It is shown elsewhere
         id: sharkPicture

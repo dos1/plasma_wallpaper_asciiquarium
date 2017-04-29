@@ -29,7 +29,6 @@ using sprite = std::vector<std::vector<spriteCell>>;
 
 static QPixmap pixmapFromTextSprite (
         const sprite &text,
-        size_t maxTextWidth,
         size_t cellWidth,
         size_t cellHeight
         )
@@ -37,7 +36,12 @@ static QPixmap pixmapFromTextSprite (
     size_t &h = cellHeight;
     size_t &w = cellWidth;
     size_t textHeight = text.size();
-    size_t textWidth  = maxTextWidth;
+    size_t textWidth = std::accumulate(
+            text.begin(), text.end(), size_t(0),
+            [](size_t cur, const std::vector<spriteCell>& row)
+            {
+                return std::max(cur, row.size());
+            });
 
     // Use QImage since we'll do a lot of repeated draw calls
     QImage pix(textWidth * w, textHeight * h, QImage::Format_ARGB32_Premultiplied);
@@ -431,6 +435,13 @@ static_assert(
         sharks.size() % 4 == 0,
         "sharks[] must have multiple of 4 sprites!");
 
+// oceans
+auto oceanSpriteText =
+    QLatin1String( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+                   "^^^^ ^^^  ^^^   ^^^    ^^^^      \n"
+                   "^^^^      ^^^^     ^^^    ^^     \n"
+                   "^^      ^^^^      ^^^    ^^^^^^  \n" );
+
 class ColorImageProvider : public QQuickImageProvider
 {
 public:
@@ -442,6 +453,9 @@ public:
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) override
     {
         QPixmap result;
+        // TODO Fix sizing here
+        const size_t cellWidth = 14;
+        const size_t cellHeight = 28;
 
         if (id == QLatin1String("black")) {
             result = QPixmap(requestedSize);
@@ -449,6 +463,39 @@ public:
             return result;
         }
 
+        const sprite textSprite = (id == QLatin1String("ocean"))
+            ? textSpriteFromString(oceanSpriteText, QLatin1String(), 0x149494)
+            : textSpriteFromFacingId(id);
+
+        result = pixmapFromTextSprite(textSprite, cellWidth, cellHeight);
+        if (size) {
+            *size = result.size();
+        }
+
+        return result;
+    }
+
+private:
+    QString colorsFromMask(QString mask)
+    {
+        static auto colors = array_of<char>(
+            'c','C','r','R','y','Y','b','B','g','G','m','M'
+        );
+        static std::uniform_int_distribution<size_t> color_rng(0, colors.size() - 1);
+
+        for (char i = '1'; i <= '9'; ++i)
+        {
+            // '4' is the eye pixel
+            const char colorId = i == '4' ? 'W'
+                                          : colors[color_rng(m_gen)];
+            mask.replace(QLatin1Char(i), QLatin1Char(colorId));
+        }
+
+        return mask;
+    }
+
+    sprite textSpriteFromFacingId(const QString &id)
+    {
         // Not something simple, determine direction first
         QStringList idComponents = id.split(QLatin1Char('/'));
         bool fromLeft = !idComponents.isEmpty() &&
@@ -457,7 +504,7 @@ public:
                 (!fromLeft && idComponents[0] != QLatin1String("from_right")))
         {
             qWarning() << "Unknown pixmap id " << id << " for asciiquarium";
-            return QPixmap();
+            return sprite{};
         }
 
         size_t arraySize = 0;
@@ -483,47 +530,12 @@ public:
         spriteId += fromLeft ? 0 : 2;
 
         const QLatin1String &colorMask = firstSprite[spriteId + 1];
-        const sprite textSprite = textSpriteFromString(
+        return textSpriteFromString(
                 firstSprite[spriteId],
                 randomizeColors
                     ? colorsFromMask(colorMask)
                     : colorMask,
                 defaultColor);
-
-        size_t maxTextWidth = std::accumulate(
-                textSprite.begin(), textSprite.end(), size_t(0),
-                [](size_t cur, const std::vector<spriteCell>& r)
-                {
-                    return std::max(cur, r.size());
-                });
-
-        result = pixmapFromTextSprite(textSprite, maxTextWidth,
-                14, 28); // TODO Fix sizing here
-
-        if(size) {
-            *size = result.size();
-        }
-
-        return result;
-    }
-
-private:
-    QString colorsFromMask(QString mask)
-    {
-        static auto colors = array_of<char>(
-            'c','C','r','R','y','Y','b','B','g','G','m','M'
-        );
-        static std::uniform_int_distribution<size_t> color_rng(0, colors.size() - 1);
-
-        for (char i = '1'; i <= '9'; ++i)
-        {
-            // '4' is the eye pixel
-            const char colorId = i == '4' ? 'W'
-                                          : colors[color_rng(m_gen)];
-            mask.replace(QLatin1Char(i), QLatin1Char(colorId));
-        }
-
-        return mask;
     }
 
 private:
