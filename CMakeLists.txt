@@ -66,9 +66,6 @@ if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
 #    kdoctools_install(po)
 endif()
 
-# TODO: Get the C++ support to build, e.g. for QQuickImageProvider to supply
-# pixmaps to the QML layout.
-#add_subdirectory(pkg)
 add_subdirectory(src)
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
