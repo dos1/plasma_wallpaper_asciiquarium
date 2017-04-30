@@ -11,27 +11,30 @@ Item {
 
     id: rootItem
 
+    property var screenWidth : Math.floor(width  / asciiquariumCellWidth)
+    property var screenHeight: Math.floor(height / asciiquariumCellHeight)
+
     Component.onCompleted: {
         var component = Qt.createComponent("Fish.qml")
 
         if (component.status == Component.Ready) {
             for (var i = 0; i < 100; i++) {
-                var startX = randBetween(0, Math.floor(stats.screenWidth / 3))
-                startX = startX * stats.moveStepX
+                var startX = randBetween(0, Math.floor(rootItem.screenWidth / 3))
+                startX = startX * asciiquariumCellWidth
                 var leftFacing = (i % 2 < 1)
 
                 if (leftFacing) {
-                    startX = rootItem.width - stats.moveStepX * 10 - startX
+                    startX = (rootItem.screenWidth - 10) * asciiquariumCellWidth - startX
                 }
 
-                var startY = randBetween(8, Math.floor(stats.screenHeight) - 10)
-                startY = startY * stats.moveStepY
+                var startY = randBetween(8, rootItem.screenHeight - 10)
+                startY = startY * asciiquariumCellHeight
 
                 try {
                     var fishy = component.createObject(fishSystem, {
                         "leftFacing": leftFacing,
                         "moveStepX": Qt.binding(function() {
-                            return stats.moveStepX
+                            return asciiquariumCellWidth
                         }),
                         "x": startX,
                         "y": startY,
@@ -54,7 +57,7 @@ Item {
         anchors.fill: parent
     }
     BorderImage {
-        y: 5 * stats.moveStepY
+        y: 5 * asciiquariumCellHeight
         anchors.left: parent.left
         anchors.right: parent.right
         source: "image://org.kde.plasma.asciiquarium/ocean"
@@ -64,8 +67,8 @@ Item {
     }
     Image {
         id: castle
-        x: stats.moveStepX * (Math.floor(stats.screenWidth)  - 32)
-        y: stats.moveStepY * (Math.floor(stats.screenHeight) - 13)
+        x: asciiquariumCellWidth  * (rootItem.screenWidth  - 32)
+        y: asciiquariumCellHeight * (rootItem.screenHeight - 13)
         source: "image://org.kde.plasma.asciiquarium/castle"
         z: 1
     }
@@ -73,27 +76,6 @@ Item {
         visible: false // Here only so we can get its size.  It is shown elsewhere
         id: sharkPicture
         source: "image://org.kde.plasma.asciiquarium/from_left/shark"
-    }
-    Text {
-        font.family: "monospace"
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
-        id: "label"
-        text: "Hello Asciiquarium World!"
-        color: "white"
-    }
-    Text {
-        anchors.top: label.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        id: stats
-        color: "green"
-
-        property int moveStepX: asciiquariumCellWidth
-        property int moveStepY: asciiquariumCellHeight
-        property real screenWidth: (parent.width / moveStepX).toFixed(1)
-        property real screenHeight: (parent.height / moveStepY).toFixed(1)
-
-        text: "Characters are " + moveStepX + " by " + moveStepY + " wide. (" + screenWidth + ", " + screenHeight + ")"
     }
     ParticleSystem {
         id: fishSystem
