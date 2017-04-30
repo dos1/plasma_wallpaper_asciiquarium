@@ -16,19 +16,23 @@ Item {
 
     Component.onCompleted: {
         var component = Qt.createComponent("Fish.qml")
+        var parentWidth  = Math.floor(fishSystem.width  / asciiquariumCellWidth)
+        var parentHeight = Math.floor(fishSystem.height / asciiquariumCellHeight)
 
         if (component.status == Component.Ready) {
             for (var i = 0; i < 100; i++) {
-                var startX = randBetween(0, Math.floor(rootItem.screenWidth / 3))
+                var startX = randBetween(0, Math.floor(parentWidth / 3))
                 startX = startX * asciiquariumCellWidth
                 var leftFacing = (i % 2 < 1)
 
                 if (leftFacing) {
-                    startX = (rootItem.screenWidth - 10) * asciiquariumCellWidth - startX
+                    startX = (parentWidth - 10) * asciiquariumCellWidth - startX
                 }
 
-                var startY = randBetween(8, rootItem.screenHeight - 10)
+                var startY = randBetween(0, parentHeight - 6)
                 startY = startY * asciiquariumCellHeight
+
+                // x, y are in terms of fishSystem, not rootItem
 
                 try {
                     var fishy = component.createObject(fishSystem, {
@@ -60,6 +64,7 @@ Item {
         y: 5 * asciiquariumCellHeight
         anchors.left: parent.left
         anchors.right: parent.right
+        id: oceanTop
         source: "image://org.kde.plasma.asciiquarium/ocean"
         cache: false
         smooth: false
@@ -79,7 +84,11 @@ Item {
     }
     ParticleSystem {
         id: fishSystem
-        anchors.fill: parent
+        anchors.top: oceanTop.bottom
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 7 * asciiquariumCellHeight // Keep fish out of the seaweed
+        anchors.left: parent.left
+        anchors.right: parent.right
 
         Emitter {
             id: sharkEmitter
