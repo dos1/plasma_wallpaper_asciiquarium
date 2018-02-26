@@ -110,5 +110,9 @@ tab and adjust the Wallpaper Type as you did for your desktop.
 - Where's the bubbles and stuff?
     - Yeah... I still need to implement the less straightforward animations. :(
 
+- How much CPU is this thing going to use?
+    - On my system on those of some others who have used it, it adds about 10%
+      CPU usage between Plasma and KWin (which has to composite the result).
+
 - Why?!?
     - Why not?
