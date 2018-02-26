@@ -26,6 +26,19 @@ Plasma 5:
 
 # Enabling
 
+Wherever you install the plugin to, Plasma has to be able to find it.  So if you're setting up
+a custom install location (whether that's /usr/local or under your home directory), you may need
+to setup your environment variables properly for Plasma (and Qt) to find it.
+
+In particular, I believe you need at least (where `$PREFIX` is the path you
+passed to CMake as the install prefix):
+
+    XDG_DATA_DIRS="$PREFIX/share:$XDG_DATA_DIRS"
+    QML2_IMPORT_PATH="$PREFIX/lib/qml"
+
+See the [Qt QML Import docs](http://doc.qt.io/qt-5/qtqml-syntax-imports.html)
+for more details on how it loads QML modules.
+
 Once installed, you may have to restart Plasma, for Plasma to recognize the
 added wallpaper package and its accompanying C++ plugin.  The easiest way is to
 logout of your desktop and log back in.
