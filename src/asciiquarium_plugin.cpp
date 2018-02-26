@@ -182,12 +182,14 @@ static sprite textSpriteFromString(
 
     // overlay mask colors
     rows = colors.split(QLatin1Char('\n'));
+    if (Q_UNLIKELY(static_cast<size_t>(rows.size()) > result.size())) {
+        qWarning() << "Sprite with color" << defaultColor << "has mismatched size!";
+        return result;
+    }
+
     size_t y = 0;
 
     for (const auto &row : qAsConst(rows)) {
-        if (y >= result.size())
-            break;
-
         for (int pos = 0;
                 pos < row.size() && static_cast<size_t>(pos) < result[y].size();
                 ++pos)
