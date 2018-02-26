@@ -128,6 +128,34 @@ static QPixmap pixmapFromTextSprite (const sprite &text)
     return QPixmap::fromImage(pix);
 }
 
+// Returns appropriate color for the given character
+static QRgb colorFromChar(const ushort char_code)
+{
+    //Colors stolen from konsole, TEWidget.cpp
+    QRgb result;
+
+    switch (char_code)
+    {
+        case 'R': result = 0xFF5454; break;
+        case 'r': result = 0xB21818; break;
+        case 'C': result = 0x54FFFF; break;
+        case 'c': result = 0x18B2B2; break;
+        case 'Y': result = 0xFFFF54; break;
+        case 'y': result = 0xB26818; break;
+        case 'G': result = 0x54FF54; break;
+        case 'g': result = 0x18B218; break;
+        case 'B': result = 0x5454FF; break;
+        case 'b': result = 0x1818B2; break;
+        case 'M': result = 0xFF54FF; break;
+        case 'm': result = 0xB218B2; break;
+        case 'W': result = 0xFFFFFF; break;
+        case 'w': result = 0xB2B2B2; break;
+        default : result = 0xFFFFFF;
+    }
+
+    return result;
+}
+
 static sprite textSpriteFromString(
         const QString &text,
         const QString &colors,
@@ -138,7 +166,7 @@ static sprite textSpriteFromString(
     sprite result;
     result.reserve(rows.size());
 
-    for(const auto &row : rows) {
+    for(const auto &row : qAsConst(rows)) {
         std::vector<spriteCell> rowVec;
         rowVec.reserve(row.size());
 
@@ -149,14 +177,14 @@ static sprite textSpriteFromString(
                         ),
                         defaultColor);
             });
-        result.emplace_back(rowVec);
+        result.emplace_back(std::move(rowVec));
     }
 
     // overlay mask colors
     rows = colors.split(QLatin1Char('\n'));
     size_t y = 0;
 
-    for(const auto &row : rows) {
+    for (const auto &row : qAsConst(rows)) {
         if (y >= result.size())
             break;
 
@@ -164,55 +192,9 @@ static sprite textSpriteFromString(
                 pos < row.size() && static_cast<size_t>(pos) < result[y].size();
                 ++pos)
         {
-            switch (row[pos].unicode())
-            {
-                //Colors stolen from konsole, TEWidget.cpp
-                case 'R':
-                    result[y][pos].second = 0xFF5454;
-                    break;
-                case 'r':
-                    result[y][pos].second = 0xB21818;
-                    break;
-                case 'C':
-                    result[y][pos].second = 0x54FFFF;
-                    break;
-                case 'c':
-                    result[y][pos].second = 0x18B2B2;
-                    break;
-                case 'Y':
-                    result[y][pos].second = 0xFFFF54;
-                    break;
-                case 'y':
-                    result[y][pos].second = 0xB26818;
-                    break;
-                case 'G':
-                    result[y][pos].second = 0x54FF54;
-                    break;
-                case 'g':
-                    result[y][pos].second = 0x18B218;
-                    break;
-                case 'B':
-                    result[y][pos].second = 0x5454FF;
-                    break;
-                case 'b':
-                    result[y][pos].second = 0x1818B2;
-                    break;
-                case 'M':
-                    result[y][pos].second = 0xFF54FF;
-                    break;
-                case 'm':
-                    result[y][pos].second = 0xB218B2;
-                    break;
-                case 'W':
-                    result[y][pos].second = 0xFFFFFF;
-                    break;
-                case 'w':
-                    result[y][pos].second = 0xB2B2B2;
-                    break;
-                case ' ':
-                    break;
-                default:
-                    result[y][pos].second = 0xFFFFFF;
+            const ushort charCode = row[pos].unicode();
+            if (charCode != ' ') {
+                result[y][pos].second = colorFromChar(charCode);
             }
         }
 
